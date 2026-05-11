@@ -44,23 +44,25 @@ async def upload_cv(file: UploadFile = File(...)):
         if not cv_text or len(cv_text) < 50:
             raise HTTPException(status_code=400, detail="Could not extract text from CV.")
 
-        sessions_collection.insert_one({
-            "session_id": session_id,
-            "filename": file.filename,
-            "status": "processing"
-        })
+        try:
+            sessions_collection.insert_one({
+                "session_id": session_id,
+                "filename": file.filename,
+                "status": "processing"
+            })
+        except Exception as db_err:
+            logger.warning("MongoDB insert skipped: %s", db_err)
 
         results = run_agent(cv_text, session_id)
 
-        results_collection.insert_one({
-            "session_id": session_id,
-            **results
-        })
-
-        sessions_collection.update_one(
-            {"session_id": session_id},
-            {"$set": {"status": "completed"}}
-        )
+        try:
+            results_collection.insert_one({"session_id": session_id, **results})
+            sessions_collection.update_one(
+                {"session_id": session_id},
+                {"$set": {"status": "completed"}}
+            )
+        except Exception as db_err:
+            logger.warning("MongoDB update skipped: %s", db_err)
 
         os.remove(file_path)
 
@@ -96,6 +98,48 @@ async def get_results(session_id: str):
 @router.get("/health")
 async def health():
     return {"status": "JobScout AI is running!"}
+
+
+@router.get("/debug")
+async def debug():
+    results = {}
+
+    # Test MongoDB
+    try:
+        from database.mongo import client as mongo_client
+        mongo_client.admin.command("ping")
+        results["mongodb"] = "ok"
+    except Exception as e:
+        results["mongodb"] = f"FAIL: {e}"
+
+    # Test Groq
+    try:
+        test_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+        resp = test_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": "Say ok"}],
+            max_tokens=5,
+        )
+        results["groq"] = "ok"
+    except Exception as e:
+        results["groq"] = f"FAIL: {e}"
+
+    # Test Tavily
+    try:
+        from tavily import TavilyClient
+        tc = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
+        tc.search("test", max_results=1)
+        results["tavily"] = "ok"
+    except Exception as e:
+        results["tavily"] = f"FAIL: {e}"
+
+    results["env"] = {
+        "GROQ_API_KEY": "set" if os.getenv("GROQ_API_KEY") else "MISSING",
+        "MONGODB_URL": "set" if os.getenv("MONGODB_URL") else "MISSING",
+        "TAVILY_API_KEY": "set" if os.getenv("TAVILY_API_KEY") else "MISSING",
+    }
+
+    return results
 
 
 class ChatRequest(BaseModel):

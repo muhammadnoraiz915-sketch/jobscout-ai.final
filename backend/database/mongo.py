@@ -6,7 +6,7 @@ load_dotenv()
 
 MONGODB_URL = os.getenv("MONGODB_URL")
 
-client = MongoClient(MONGODB_URL)
+client = MongoClient(MONGODB_URL, serverSelectionTimeoutMS=5000, connectTimeoutMS=5000, tlsAllowInvalidCertificates=True)
 db = client["jobscout"]
 
 # Collections
