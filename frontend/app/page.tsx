@@ -166,17 +166,37 @@ export default function Home() {
                   background:"#1e293b", borderRadius:"16px", padding:"24px",
                   borderLeft: `4px solid ${job.score>=70?"#22c55e":job.score>=40?"#f59e0b":"#ef4444"}`
                 }}>
-                  <div style={{display:"flex", justifyContent:"space-between", alignItems:"start", gap:"12px"}}>
-                    <div>
-                      <a href={job.url} target="_blank" rel="noreferrer"
-                        style={{color:"white", fontWeight:"bold", fontSize:"1.1rem", textDecoration:"none"}}>
+                  {/* Card header: title + score + Apply Now */}
+                  <div style={{display:"flex", justifyContent:"space-between", alignItems:"start", gap:"12px", flexWrap:"wrap"}}>
+                    <div style={{flex:1, minWidth:0}}>
+                      <p style={{color:"white", fontWeight:"bold", fontSize:"1.1rem", margin:0, lineHeight:"1.4"}}>
                         {job.title}
-                      </a>
-                      <p style={{color:"#64748b", fontSize:"0.85rem", marginTop:"4px"}}>via {job.source}</p>
+                      </p>
+                      <p style={{color:"#64748b", fontSize:"0.85rem", marginTop:"4px", marginBottom:0}}>via {job.source}</p>
                     </div>
-                    <span style={{fontSize:"2rem", fontWeight:"bold", color:job.score>=70?"#22c55e":job.score>=40?"#f59e0b":"#ef4444", whiteSpace:"nowrap"}}>
-                      {job.score}%
-                    </span>
+                    <div style={{display:"flex", flexDirection:"column", alignItems:"flex-end", gap:"8px", flexShrink:0}}>
+                      <span style={{fontSize:"2rem", fontWeight:"bold", color:job.score>=70?"#22c55e":job.score>=40?"#f59e0b":"#ef4444", lineHeight:1}}>
+                        {job.score}%
+                      </span>
+                      <a
+                        href={job.url || `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(job.title)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          display:"inline-block",
+                          background: job.score>=70 ? "#22c55e" : job.score>=40 ? "#f59e0b" : "#4f46e5",
+                          color:"white",
+                          fontWeight:"700",
+                          fontSize:"0.85rem",
+                          padding:"8px 18px",
+                          borderRadius:"8px",
+                          textDecoration:"none",
+                          whiteSpace:"nowrap",
+                        }}
+                      >
+                        Apply Now →
+                      </a>
+                    </div>
                   </div>
                   <div style={{background:"#0f172a", borderRadius:"8px", padding:"12px", marginTop:"12px"}}>
                     <p style={{color:"#94a3b8", fontSize:"0.8rem", marginBottom:"4px", fontWeight:"bold"}}>🤖 AI Reasoning:</p>
@@ -192,30 +212,11 @@ export default function Home() {
                       ))}
                     </div>
                   )}
-                  <div style={{marginTop:"16px", display:"flex", gap:"8px", flexWrap:"wrap"}}>
-                    <a
-                      href={job.url || `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(job.title)}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{
-                        display:"inline-block",
-                        background:"#4f46e5",
-                        color:"white",
-                        fontWeight:"600",
-                        fontSize:"0.9rem",
-                        padding:"10px 20px",
-                        borderRadius:"8px",
-                        textDecoration:"none",
-                      }}
-                    >
-                      Apply Now →
-                    </a>
-                    {!job.url && (
-                      <span style={{color:"#64748b", fontSize:"0.8rem", alignSelf:"center"}}>
-                        (direct link unavailable — searching {job.source || "LinkedIn"})
-                      </span>
-                    )}
-                  </div>
+                  {!job.url && (
+                    <p style={{color:"#475569", fontSize:"0.75rem", marginTop:"8px", marginBottom:0}}>
+                      Direct link unavailable — button searches {job.source || "LinkedIn"} by title
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
