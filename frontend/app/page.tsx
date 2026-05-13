@@ -192,6 +192,27 @@ export default function Home() {
                       ))}
                     </div>
                   )}
+                  {job.url && (
+                    <div style={{marginTop:"16px"}}>
+                      <a
+                        href={job.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          display:"inline-block",
+                          background:"#4f46e5",
+                          color:"white",
+                          fontWeight:"600",
+                          fontSize:"0.9rem",
+                          padding:"10px 20px",
+                          borderRadius:"8px",
+                          textDecoration:"none",
+                        }}
+                      >
+                        Apply Now
+                      </a>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
