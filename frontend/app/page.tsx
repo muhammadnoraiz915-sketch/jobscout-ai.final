@@ -192,27 +192,30 @@ export default function Home() {
                       ))}
                     </div>
                   )}
-                  {job.url && (
-                    <div style={{marginTop:"16px"}}>
-                      <a
-                        href={job.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        style={{
-                          display:"inline-block",
-                          background:"#4f46e5",
-                          color:"white",
-                          fontWeight:"600",
-                          fontSize:"0.9rem",
-                          padding:"10px 20px",
-                          borderRadius:"8px",
-                          textDecoration:"none",
-                        }}
-                      >
-                        Apply Now
-                      </a>
-                    </div>
-                  )}
+                  <div style={{marginTop:"16px", display:"flex", gap:"8px", flexWrap:"wrap"}}>
+                    <a
+                      href={job.url || `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(job.title)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        display:"inline-block",
+                        background:"#4f46e5",
+                        color:"white",
+                        fontWeight:"600",
+                        fontSize:"0.9rem",
+                        padding:"10px 20px",
+                        borderRadius:"8px",
+                        textDecoration:"none",
+                      }}
+                    >
+                      Apply Now →
+                    </a>
+                    {!job.url && (
+                      <span style={{color:"#64748b", fontSize:"0.8rem", alignSelf:"center"}}>
+                        (direct link unavailable — searching {job.source || "LinkedIn"})
+                      </span>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

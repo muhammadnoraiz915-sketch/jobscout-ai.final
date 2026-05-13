@@ -34,7 +34,12 @@ def score_job(job: dict, cv_info: dict) -> dict:
         result = response.choices[0].message.content
         result = result.replace("```json", "").replace("```", "").strip()
         scored_data = json.loads(result)
-        return {**job, **scored_data}
+        return {
+            **job,
+            "score": int(scored_data.get("score", 50)),
+            "reasoning": scored_data.get("reasoning", "Score unavailable"),
+            "missing_skills": scored_data.get("missing_skills", []),
+        }
     except json.JSONDecodeError as e:
         logger.warning("score_job JSON parse failed for '%s': %s", job.get('title', ''), e)
         return {**job, "score": 50, "reasoning": "Score unavailable", "missing_skills": []}

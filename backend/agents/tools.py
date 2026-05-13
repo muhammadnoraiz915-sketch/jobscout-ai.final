@@ -25,11 +25,21 @@ def search_jobs(query: str) -> list:
         
         jobs = []
         for r in results.get("results", []):
+            url = r.get("url", "").strip()
+            title = r.get("title", "").strip()
+            source = url.split("/")[2] if url else ""
+
+            # Fallback: build a LinkedIn search URL when Tavily returns no direct link
+            if not url and title:
+                encoded = title.replace(" ", "+")
+                url = f"https://www.linkedin.com/jobs/search/?keywords={encoded}"
+                source = "linkedin.com"
+
             jobs.append({
-                "title": r.get("title", ""),
-                "url": r.get("url", ""),
+                "title": title,
+                "url": url,
                 "description": r.get("content", "")[:500],
-                "source": r.get("url", "").split("/")[2] if r.get("url") else ""
+                "source": source,
             })
         return jobs
     except Exception as e:
